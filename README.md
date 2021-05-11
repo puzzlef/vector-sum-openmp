@@ -1,37 +1,62 @@
-Performance of sequential execution based vs OpenMP based vector multiply.
+Performance of sequential execution based vs OpenMP based vector element sum.
 
 This experiment was for comparing the performance between:
-1. Find `x*y` using a single thread (**sequential**).
-2. Find `x*y` accelerated using **OpenMP**.
+1. Find `Σx` using a single thread (**sequential**).
+2. Find `Σx` accelerated using **OpenMP**.
 
-Here `x`, `y` are both floating-point vectors. Both approaches were attempted
-on a number of vector sizes, running each approach 5 times per size to get a
+Here `x` is a floating-point vector. Both approaches were attempted on a
+number of vector sizes, running each approach 5 times per size to get a
 good time measure. While it might seem that **OpenMP** method would be a clear
-winner, the results indicate it is not the case. This is possibly becuase of
-high communication costs, and not enough computational workload as indicated
-by [this answer].
+winner, the results indicate it is dependent upon the workload. If the vector
+size is small, using a small number of threads has a lower overhead. When the
+vector size is large, using a larger number of thread helps. This is possibly
+because with a large vector, the overhead associated with managing threads is
+smaller than the work to be done.
 
 ```bash
 $ g++ -O3 -fopenmp main.cxx
-$ ./a.out
+$ OMP_NUM_THREADS=4 ./a.out
 
-# [00000.001 ms; 1e+04 elems.] multiply
-# [00000.001 ms; 1e+04 elems.] multiplyOmp
+# [00000.050 ms; 1e+04 elems.] [1.644834] sum
+# [00000.084 ms; 1e+04 elems.] [1.644834] sumOmp
 #
-# [00000.015 ms; 1e+05 elems.] multiply
-# [00000.015 ms; 1e+05 elems.] multiplyOmp
+# [00000.464 ms; 1e+05 elems.] [1.644924] sum
+# [00000.130 ms; 1e+05 elems.] [1.644924] sumOmp
 #
-# [00000.158 ms; 1e+06 elems.] multiply
-# [00000.158 ms; 1e+06 elems.] multiplyOmp
+# [00001.715 ms; 1e+06 elems.] [1.644933] sum
+# [00000.508 ms; 1e+06 elems.] [1.644933] sumOmp
 #
-# [00002.145 ms; 1e+07 elems.] multiply
-# [00002.145 ms; 1e+07 elems.] multiplyOmp
+# [00014.652 ms; 1e+07 elems.] [1.644934] sum
+# [00005.921 ms; 1e+07 elems.] [1.644934] sumOmp
 #
-# [00022.215 ms; 1e+08 elems.] multiply
-# [00022.215 ms; 1e+08 elems.] multiplyOmp
+# [00144.494 ms; 1e+08 elems.] [1.644934] sum
+# [00040.842 ms; 1e+08 elems.] [1.644934] sumOmp
 #
-# [00218.564 ms; 1e+09 elems.] multiply
-# [00218.564 ms; 1e+09 elems.] multiplyOmp
+# [01444.743 ms; 1e+09 elems.] [1.644934] sum
+# [00408.852 ms; 1e+09 elems.] [1.644934] sumOmp
+```
+
+```bash
+$ g++ -O3 -fopenmp main.cxx
+$ OMP_NUM_THREADS=48 ./a.out
+
+# [00000.039 ms; 1e+04 elems.] [1.644834] sum
+# [00025.367 ms; 1e+04 elems.] [1.644834] sumOmp
+#
+# [00000.169 ms; 1e+05 elems.] [1.644924] sum
+# [00023.483 ms; 1e+05 elems.] [1.644924] sumOmp
+#
+# [00001.685 ms; 1e+06 elems.] [1.644933] sum
+# [00020.744 ms; 1e+06 elems.] [1.644933] sumOmp
+#
+# [00015.561 ms; 1e+07 elems.] [1.644934] sum
+# [00022.450 ms; 1e+07 elems.] [1.644934] sumOmp
+#
+# [00145.128 ms; 1e+08 elems.] [1.644934] sum
+# [00026.619 ms; 1e+08 elems.] [1.644934] sumOmp
+#
+# [01443.808 ms; 1e+09 elems.] [1.644934] sum
+# [00171.276 ms; 1e+09 elems.] [1.644934] sumOmp
 ```
 
 <br>
@@ -40,12 +65,10 @@ $ ./a.out
 
 ## References
 
-- [open MP - dot product][this answer]
+- [Parallel for loop in openmp](https://stackoverflow.com/a/11773714/1413259)
 - [What's the difference between “static” and “dynamic” schedule in OpenMP?](https://stackoverflow.com/a/10852852/1413259)
 
 <br>
 <br>
 
-[![](https://i.imgur.com/XDeCwiz.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
-
-[this answer]: https://stackoverflow.com/a/5368572/1413259
+[![](https://i.imgur.com/KoxZ0HW.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
