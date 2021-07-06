@@ -1,4 +1,5 @@
-Performance of sequential execution based vs OpenMP based vector element sum.
+Performance of **sequential** execution based vs **OpenMP** based
+**vector element sum**.
 
 This experiment was for comparing the performance between:
 1. Find `Σx` using a single thread (**sequential**).
@@ -11,7 +12,15 @@ winner, the results indicate it is dependent upon the workload. If the vector
 size is small, using a small number of threads has a lower overhead. When the
 vector size is large, using a larger number of thread helps. This is possibly
 because with a large vector, the overhead associated with managing threads is
-smaller than the work to be done.
+smaller than the work to be done. Note that neither approach makes use of
+*SIMD instructions* which are available on all modern hardware.
+
+All outputs are saved in [out](out/) and a small part of the output is listed
+here. Some [charts] are also included below, generated from [sheets]. This
+experiment was done with guidance from [Prof. Dip Sankar Banerjee] and
+[Prof. Kishore Kothapalli].
+
+<br>
 
 ```bash
 $ g++ -O3 -fopenmp main.cxx
@@ -59,6 +68,8 @@ $ OMP_NUM_THREADS=48 ./a.out
 # [00156.583 ms; 1e+09 elems.] [1.644934] sumOmp
 ```
 
+[![](https://i.imgur.com/RUIcuwK.gif)][sheets]
+
 <br>
 <br>
 
@@ -72,3 +83,8 @@ $ OMP_NUM_THREADS=48 ./a.out
 <br>
 
 [![](https://i.imgur.com/KoxZ0HW.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
+
+[Prof. Dip Sankar Banerjee]: https://sites.google.com/site/dipsankarban/
+[Prof. Kishore Kothapalli]: https://cstar.iiit.ac.in/~kkishore/
+[charts]: https://photos.app.goo.gl/ruBBeXTz6vEATFQc6
+[sheets]: https://docs.google.com/spreadsheets/d/1ZBp9TFxisTn_8_7_X_2HSPt_SbmP16gUW6_fiMtr8rc/edit?usp=sharing
