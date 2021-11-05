@@ -3,9 +3,8 @@ const os = require('os');
 const path = require('path');
 
 const RELEMS = /^# Elements (.+)/m;
-const RRESLT = /^\[(.+?) ms\] \[(.+?)\] (\w+)(?:<<<(\d+), (\d+)>>>)?/m;
-const RPSUMM = /^(.+?),(.+?),(.+?),(.+?),"(.+?)",(.+?),(.+?),(.+)/m;
-const RPTECH = /^multiplyCuda/m;
+const RRESLT = /^\[(.+?) ms\] \[(.+?)\] (\w+)(?: \[(\d+) threads; schedule (\w+) (\d+)\])?/m;
+
 
 
 
@@ -50,13 +49,14 @@ function readLogLine(ln, data, state) {
     state = {elements};
   }
   else if (RRESLT.test(ln)) {
-    var [, time, sum, technique, grid_limit, block_size] = RRESLT.exec(ln);
+    var [, time, sum, technique, num_threads, schedule_kind, chunk_size] = RRESLT.exec(ln);
     data.get(state.elements).push(Object.assign({}, state, {
       time:       parseFloat(time),
       sum:        parseFloat(sum),
       technique,
-      grid_limit: parseFloat(grid_limit||'0'),
-      block_size: parseFloat(block_size||'0')
+      num_threads:   parseFloat(num_threads||'0'),
+      schedule_kind: schedule_kind||'',
+      chunk_size:    parseFloat(chunk_size||'0')
     }));
   }
   return state;
@@ -75,51 +75,6 @@ function readLog(pth) {
 
 
 
-// *-PROF
-// ------
-
-function readProfLine(ln, data, state) {
-  if (RPSUMM.test(ln)) {
-    var [, id, time, api_call_id, function_name, demangled_name,
-      device_name, sol_sm_percent, sol_memory_percent] = RPSUMM.exec(ln);
-    if (state==null) {
-      var group = 'all';
-      if (!data.has(group)) data.set(group, []);
-      state = {group};
-    }
-    if (id!=='ID') data.get(state.group).push(Object.assign({}, state, {
-      id:                 parseFloat(id),
-      time,
-      api_call_id:        parseFloat(api_call_id),
-      function_name,
-      demangled_name,
-      device_name,
-      sol_sm_percent:     parseFloat(sol_sm_percent),
-      sol_memory_percent: parseFloat(sol_memory_percent),
-    }));
-  }
-  return state;
-}
-
-function profFields(r) {
-  var sol_sm_percent     = r? r.sol_sm_percent : 0;
-  var sol_memory_percent = r? r.sol_memory_percent : 0;
-  return {sol_sm_percent, sol_memory_percent};
-}
-
-function readProf(pth) {
-  var text = readFile(pth);
-  var lines = text.split('\n');
-  var data = new Map();
-  var state = null;
-  for (var ln of lines)
-    state = readProfLine(ln, data, state);
-  return data;
-}
-
-
-
-
 // PROCESS-*
 // ---------
 
@@ -131,32 +86,13 @@ function processCsv(data) {
 }
 
 
-function processProf(data, prof) {
-  var prows = prof.get('all'), i = 0;
-  for (var rows of data.values()) {
-    for (var r of rows) {
-      var pr = RPTECH.test(r.technique)? prows[i++] : null;
-      Object.assign(r, profFields(pr));
-    }
-  }
-  return data;
-}
-
-
 
 
 // MAIN
 // ----
 
-function readInput(inp) {
-  var [log, prof] = inp.split('+');
+function main(cmd, log, out) {
   var data = readLog(log);
-  if (prof) processProf(data, readProf(prof));
-  return data;
-}
-
-function main(cmd, inp, out) {
-  var data = readInput(inp);
   if (path.extname(out)==='') cmd += '-dir';
   switch (cmd) {
     case 'csv':
