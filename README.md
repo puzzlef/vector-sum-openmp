@@ -1,77 +1,50 @@
-Comparing various launch configs for CUDA based vector multiply.
+Comparing various *schedules* for *OpenMP-based* **vector element sum**.
 
-`TODO!`
+Two floating-point vectors `x` and `y`, with number of **elements** from `1E+6`
+to `1E+9` were multiplied using OpenMP. Each element count was attempted with
+various **OpenMP schedule configs**, running each config 5 times to get a good
+time measure. Sum here represents any `reduce()` operation that processes
+several values to a single value. Results indicate a **num-threads** of `32`,
+and a **schedule-kind** of `auto` to be suitable (for **float**).
 
-Two floating-point vectors `x` and `y`, with number of **elements** from `1E+6` to `1E+9` were multiplied using CUDA. Each element count was attempted with various **CUDA launch configs**, running each config 5 times to get a good time measure. Multiplication here represents any memory-aligned independent operation, or a `map()` operation. Results indicate that a **grid_limit** of `16384/32768`, and a **block_size** of `128/256` to be suitable for both **float** and **double**. Using a **grid_limit** of `MAX` and a **block_size** of `256` could be a decent choice.
-
-All outputs are saved in [out](out/) and a small part of the output is listed here. [Nsight Compute] profile results are saved in [prof](prof/). Some [charts] are also included below, generated from [sheets]. This experiment was done with guidance from [Prof. Dip Sankar Banerjee] and [Prof. Kishore Kothapalli].
+All outputs are saved in [out](out/) and a small part of the output is listed
+here. Some [charts] are also included below, generated from [sheets].
 
 <br>
 
 ```bash
-$ nvcc -std=c++17 -Xcompiler -O3 main.cu
+$ g++ -O3 -fopenmp main.cxx
 $ ./a.out
 
 # ...
 #
-# # Elements 1e+07
-# [00002.138 ms] [1.644725] multiplySeq
-# [00000.243 ms] [1.644725] multiplyCuda<<<1024, 32>>>
-# [00000.179 ms] [1.644725] multiplyCuda<<<1024, 64>>>
-# [00000.170 ms] [1.644725] multiplyCuda<<<1024, 128>>>
-# [00000.169 ms] [1.644725] multiplyCuda<<<1024, 256>>>
-# [00000.172 ms] [1.644725] multiplyCuda<<<1024, 512>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<1024, 1024>>>
-# [00000.181 ms] [1.644725] multiplyCuda<<<2048, 32>>>
-# [00000.171 ms] [1.644725] multiplyCuda<<<2048, 64>>>
-# [00000.170 ms] [1.644725] multiplyCuda<<<2048, 128>>>
-# [00000.170 ms] [1.644725] multiplyCuda<<<2048, 256>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<2048, 512>>>
-# [00000.162 ms] [1.644725] multiplyCuda<<<2048, 1024>>>
-# [00000.186 ms] [1.644725] multiplyCuda<<<4096, 32>>>
-# [00000.169 ms] [1.644725] multiplyCuda<<<4096, 64>>>
-# [00000.172 ms] [1.644725] multiplyCuda<<<4096, 128>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<4096, 256>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<4096, 512>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<4096, 1024>>>
-# [00000.189 ms] [1.644725] multiplyCuda<<<8192, 32>>>
-# [00000.171 ms] [1.644725] multiplyCuda<<<8192, 64>>>
-# [00000.169 ms] [1.644725] multiplyCuda<<<8192, 128>>>
-# [00000.166 ms] [1.644725] multiplyCuda<<<8192, 256>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<8192, 512>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<8192, 1024>>>
-# [00000.181 ms] [1.644725] multiplyCuda<<<16384, 32>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<16384, 64>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<16384, 128>>>
-# [00000.166 ms] [1.644725] multiplyCuda<<<16384, 256>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<16384, 512>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<16384, 1024>>>
-# [00000.184 ms] [1.644725] multiplyCuda<<<32768, 32>>>
-# [00000.168 ms] [1.644725] multiplyCuda<<<32768, 64>>>
-# [00000.167 ms] [1.644725] multiplyCuda<<<32768, 128>>>
-# [00000.166 ms] [1.644725] multiplyCuda<<<32768, 256>>>
-# [00000.166 ms] [1.644725] multiplyCuda<<<32768, 512>>>
-# [00000.169 ms] [1.644725] multiplyCuda<<<32768, 1024>>>
-#
+# Elements 1e+07
+# [00017.005 ms] [1.644725] sumSeq
+# [00017.002 ms] [1.644725] sumOpenmp [1 threads; schedule static 64]
+# [00016.983 ms] [1.644725] sumOpenmp [1 threads; schedule static 128]
+# [00016.988 ms] [1.644725] sumOpenmp [1 threads; schedule static 256]
+# [00016.729 ms] [1.644725] sumOpenmp [1 threads; schedule static 512]
+# [00015.477 ms] [1.644725] sumOpenmp [1 threads; schedule static 1024]
+# [00015.384 ms] [1.644725] sumOpenmp [1 threads; schedule static 2048]
+# [00015.472 ms] [1.644725] sumOpenmp [1 threads; schedule static 4096]
+# [00015.434 ms] [1.644725] sumOpenmp [1 threads; schedule static 8192]
+# [00015.471 ms] [1.644725] sumOpenmp [1 threads; schedule static 16384]
+# [00015.525 ms] [1.644725] sumOpenmp [1 threads; schedule static 32768]
+# [00015.770 ms] [1.644725] sumOpenmp [1 threads; schedule static 65536]
 # ...
 ```
 
-[![](https://i.imgur.com/bGUUPot.gif)][sheetp]
-[![](https://i.imgur.com/eLQ7XpP.gif)][sheetp]
+[![](https://i.imgur.com/81zeekV.png)][sheetp]
+[![](https://i.imgur.com/zaum47S.png)][sheetp]
+[![](https://i.imgur.com/hK3yEyB.png)][sheetp]
+[![](https://i.imgur.com/G916hQw.png)][sheetp]
+[![](https://i.imgur.com/9mRfPvR.png)][sheetp]
 
-[![](https://i.imgur.com/IagoPuk.gif)][sheetp]
-[![](https://i.imgur.com/4L394Vk.gif)][sheetp]
-
-[![](https://i.imgur.com/tCUuW0a.gif)][sheetp]
-[![](https://i.imgur.com/tZaV8K6.gif)][sheetp]
-
-[![](https://i.imgur.com/U6jbPeH.gif)][sheetp]
-[![](https://i.imgur.com/mpjbvkK.gif)][sheetp]
-
-[![](https://i.imgur.com/TVSzgPr.png)][sheetp]
-[![](https://i.imgur.com/edMTlIA.png)][sheetp]
-[![](https://i.imgur.com/g5oxQ1H.png)][sheetp]
-[![](https://i.imgur.com/1Jyepy2.png)][sheetp]
+[![](https://i.imgur.com/g4Th6c1.png)][sheetp]
+[![](https://i.imgur.com/sjnMTmb.png)][sheetp]
+[![](https://i.imgur.com/K2Dkk50.png)][sheetp]
+[![](https://i.imgur.com/QQ6GgKw.png)][sheetp]
+[![](https://i.imgur.com/sao63mM.png)][sheetp]
 
 <br>
 <br>
@@ -79,17 +52,14 @@ $ ./a.out
 
 ## References
 
-- [CUDA by Example :: Jason Sanders, Edward Kandrot](https://www.slideshare.net/SubhajitSahu/cuda-by-example-notes)
+- [What's the difference between "static" and "dynamic" schedule in OpenMP?](https://stackoverflow.com/a/10852852/1413259)
+- [OpenMP Dynamic vs Guided Scheduling](https://stackoverflow.com/a/43047074/1413259)
 
 <br>
 <br>
 
-[![](https://i.imgur.com/lRwvZLe.png)](https://www.youtube.com/watch?v=vTdodyhhjww)
-[![DOI](https://zenodo.org/badge/375073607.svg)](https://zenodo.org/badge/latestdoi/375073607)
+[![](https://i.imgur.com/MJi0vOn.jpg)](https://knowyourcodelyokofacts.tumblr.com/post/49493220478/jeremy-belpois-jeremy-is-known-to-have-been)
 
-[Prof. Dip Sankar Banerjee]: https://sites.google.com/site/dipsankarban/
-[Prof. Kishore Kothapalli]: https://cstar.iiit.ac.in/~kkishore/
-[Nsight Compute]: https://developer.nvidia.com/nsight-compute
-[charts]: https://photos.app.goo.gl/xorYb1MZSNqxUgNy7
-[sheets]: https://docs.google.com/spreadsheets/d/1fWcVNQbANgiNepryktAsIWUHCNiAi-Yf1qQyiLsTJio/edit?usp=sharing
-[sheetp]: https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5RS676pMmWtXRj0AaPSkBDdFHZWTEDgyMJGDq2mdSz7GfWektVErY130Y84eTAxuCMDGogdvLEzyZ/pubhtml
+[charts]: https://photos.app.goo.gl/2XgojedirZ3LZhy47
+[sheets]: https://docs.google.com/spreadsheets/d/1m0IhoxjrarXYqE6yr_NdHlIrNn9QpkkOrHPidmNTcbo/edit?usp=sharing
+[sheetp]: https://docs.google.com/spreadsheets/d/e/2PACX-1vTlIUrPp-YXzG2Svlwrg-uVZLja-csxl1m6iMEv9RXC0vxo9O_Ra5S4_ztl1PUg79QU4I3XefV3V7dJ/pubhtml
