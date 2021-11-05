@@ -8,7 +8,7 @@ using std::vector;
 
 
 template <class T>
-auto sumLoop(const T *x, int N) {
+T sumLoop(const T *x, int N) {
   T a = T();
   for (int i=0; i<N; i++)
     a += x[i];
@@ -17,8 +17,8 @@ auto sumLoop(const T *x, int N) {
 
 template <class T>
 SumResult<T> sumSeq(const T *x, int N, const SumOptions& o={}) {
-  T a = T(); float t = measureDuration([&]() { a = sumLoop(x, N) }, o.repeat);
-  return a;
+  T a = T(); float t = measureDuration([&]() { a = sumLoop(x, N); }, o.repeat);
+  return {a, t};
 }
 
 template <class T>

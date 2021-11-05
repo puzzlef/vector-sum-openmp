@@ -28,7 +28,7 @@ SumResult<T> sumOpenmp(const T *x, int N, const SumOptions& o={}) {
   omp_set_num_threads(NT);
   omp_set_schedule((omp_sched_t) SK, SC);
   T a = T(); float t = measureDuration([&] { a = sumOmp(x, N); }, o.repeat);
-  return a;
+  return {a, t};
 }
 
 template <class T>
