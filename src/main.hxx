@@ -1,5 +1,5 @@
 #pragma once
 #include "_main.hxx"
-#include "multiply.hxx"
-#include "multiplySeq.hxx"
-#include "multiplyOpenmp.hxx"
+#include "sum.hxx"
+#include "sumSeq.hxx"
+#include "sumOpenmp.hxx"

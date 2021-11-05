@@ -11,17 +11,16 @@ using namespace std;
 #define TYPE float
 
 
-void runMultiply(int N, int repeat) {
-  vector<TYPE> a0(N), a1(N), a2(N), a3(N), a4(N);
-  vector<TYPE> x(N), y(N);
+void runSum(int N, int repeat) {
+  vector<TYPE> x(N);
   for (int i=0; i<N; i++) {
-    x[i] = 1.0/(i+1);
-    y[i] = 1.0/(i+1);
+    TYPE n = i+1;
+    x[i] = 1/(n*n);
   }
 
-  // Find x*y using a single thread.
-  float t0 = multiplySeq(a0, x, y, {repeat});
-  printf("[%09.3f ms] [%f] multiplySeq\n", t0, sum(a0));
+  // Find Σx using a single thread.
+  auto a0 = sumSeq(x, {repeat});
+  printf("[%09.3f ms] [%f] sumSeq\n", a0.time, a0.result);
 
   // Find x*y accelerated using OpenMP.
   int maxThreads = omp_get_max_threads();
@@ -31,26 +30,26 @@ void runMultiply(int N, int repeat) {
     if (threads>maxThreads) { threads = maxThreads;  done = true; }
     // Use static schedule.
     for (int chunkSize=64; chunkSize<=65536; chunkSize*=2) {
-      float t1 = multiplyOpenmp(a1, x, y, {repeat, threads, omp_sched_static, chunkSize});
-      printf("[%09.3f ms] [%f] multiplyOpenmp [%d threads; schedule static %d]\n", t1, sum(a1), threads, chunkSize);
+      auto a1 = sumOpenmp(x, {repeat, threads, omp_sched_static, chunkSize});
+      printf("[%09.3f ms] [%f] sumOpenmp [%d threads; schedule static %d]\n", a1.time, a1.result, threads, chunkSize);
     }
 
     // Use dynamic schedule.
     for (int chunkSize=64; chunkSize<=65536; chunkSize*=2) {
-      float t2 = multiplyOpenmp(a2, x, y, {repeat, threads, omp_sched_dynamic, chunkSize});
-      printf("[%09.3f ms] [%f] multiplyOpenmp [%d threads; schedule dynamic %d]\n", t2, sum(a2), threads, chunkSize);
+      auto a2 = sumOpenmp(x, {repeat, threads, omp_sched_dynamic, chunkSize});
+      printf("[%09.3f ms] [%f] sumOpenmp [%d threads; schedule dynamic %d]\n", a2.time, a2.result, threads, chunkSize);
     }
 
     // Use guided schedule.
     for (int chunkSize=64; chunkSize<=65536; chunkSize*=2) {
-      float t3 = multiplyOpenmp(a3, x, y, {repeat, threads, omp_sched_guided, chunkSize});
-      printf("[%09.3f ms] [%f] multiplyOpenmp [%d threads; schedule guided %d]\n", t3, sum(a3), threads, chunkSize);
+      auto a3 = sumOpenmp(x, {repeat, threads, omp_sched_guided, chunkSize});
+      printf("[%09.3f ms] [%f] sumOpenmp [%d threads; schedule guided %d]\n", a3.time, a3.result, threads, chunkSize);
     }
 
     // Use auto schedule.
     for (int chunkSize=64; chunkSize<=65536; chunkSize*=2) {
-      float t4 = multiplyOpenmp(a4, x, y, {repeat, threads, omp_sched_auto, chunkSize});
-      printf("[%09.3f ms] [%f] multiplyOpenmp [%d threads; schedule auto %d]\n", t4, sum(a4), threads, chunkSize);
+      auto a4 = sumOpenmp(x, {repeat, threads, omp_sched_auto, chunkSize});
+      printf("[%09.3f ms] [%f] sumOpenmp [%d threads; schedule auto %d]\n", a4.time, a4.result, threads, chunkSize);
     }
     if (done) break;
   }
@@ -61,7 +60,7 @@ int main(int argc, char **argv) {
   int repeat = argc>1? stoi(argv[1]) : 5;
   for (int n=1000000; n<=1000000000; n*=10) {
     printf("# Elements %.0e\n", (double) n);
-    runMultiply(n, repeat);
+    runSum(n, repeat);
     printf("\n");
   }
   return 0;

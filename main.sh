@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-src="multiply-openmp-adjust-schedule"
+src="sum-openmp-adjust-schedule"
 out="/home/resources/Documents/subhajit/$src.log"
 ulimit -s unlimited
 printf "" > "$out"

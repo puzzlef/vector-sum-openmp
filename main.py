@@ -1,7 +1,7 @@
-# https://www.kaggle.com/wolfram77/puzzlef-multiply-openmp-adjust-schedule
+# https://www.kaggle.com/wolfram77/puzzlef-sum-openmp-adjust-schedule
 import os
 from IPython.display import FileLink
-src="multiply-openmp-adjust-schedule"
+src="sum-openmp-adjust-schedule"
 out="{}.txt".format(src)
 !printf "" > "$out"
 display(FileLink(out))
