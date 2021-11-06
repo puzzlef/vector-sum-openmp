@@ -20,11 +20,11 @@ void runSum(int N, int repeat) {
 
   // Find Σx using a single thread.
   auto a1 = sumSeq(x, {repeat});
-  printf("[%09.3f ms; %.0e elems.] [%f] sum\n", a1.time, (double) N, a1.result);
+  printf("[%09.3f ms; %.0e elems.] [%f] sumSeq\n", a1.time, (double) N, a1.result);
 
   // Find Σx accelerated using OpenMP.
   auto a2 = sumOpenmp(x, {repeat});
-  printf("[%09.3f ms; %.0e elems.] [%f] sumOmp\n", a2.time, (double) N, a2.result);
+  printf("[%09.3f ms; %.0e elems.] [%f] sumOpenmp\n", a2.time, (double) N, a2.result);
 }
 
 
