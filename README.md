@@ -1,74 +1,42 @@
-Performance of **sequential** execution based vs **OpenMP** based
-**vector element sum**.
+Performance of *sequential* vs *OpenMP-based* **vector element sum**.
 
 This experiment was for comparing the performance between:
 1. Find `Σx` using a single thread (**sequential**).
 2. Find `Σx` accelerated using **OpenMP**.
 
-Here `x` is a floating-point vector. Both approaches were attempted on a
-number of vector sizes, running each approach 5 times per size to get a
-good time measure. While it might seem that **OpenMP** method would be a clear
-winner, the results indicate it is dependent upon the workload. If the vector
-size is small, using a small number of threads has a lower overhead. When the
-vector size is large, using a larger number of thread helps. This is possibly
-because with a large vector, the overhead associated with managing threads is
-smaller than the work to be done. Note that neither approach makes use of
-*SIMD instructions* which are available on all modern hardware.
+Here `x` is a floating-point vector. Both approaches were attempted on a number
+of vector sizes, running each approach 5 times per size to get a good time
+measure. Note that neither approach makes use of *SIMD instructions* which are
+available on all modern hardware. While it might seem that **OpenMP** method
+would be a clear winner, the results indicate it is dependent upon the workload.
+Results indicate that **from 10⁵ elements, OpenMP** **approach performs better**
+than sequential.
 
 All outputs are saved in [out](out/) and a small part of the output is listed
-here. Some [charts] are also included below, generated from [sheets]. This
-experiment was done with guidance from [Prof. Dip Sankar Banerjee] and
-[Prof. Kishore Kothapalli].
+here. Some [charts] are also included below, generated from [sheets].
 
 <br>
 
 ```bash
 $ g++ -O3 -fopenmp main.cxx
-$ OMP_NUM_THREADS=4 ./a.out
+$ ./a.out
 
-# [00000.050 ms; 1e+04 elems.] [1.644834] sum
-# [00000.096 ms; 1e+04 elems.] [1.644834] sumOmp
-#
-# [00000.252 ms; 1e+05 elems.] [1.644924] sum
-# [00000.132 ms; 1e+05 elems.] [1.644924] sumOmp
-#
-# [00001.689 ms; 1e+06 elems.] [1.644933] sum
-# [00000.612 ms; 1e+06 elems.] [1.644933] sumOmp
-#
-# [00014.266 ms; 1e+07 elems.] [1.644934] sum
-# [00006.002 ms; 1e+07 elems.] [1.644934] sumOmp
-#
-# [00143.640 ms; 1e+08 elems.] [1.644934] sum
-# [00043.818 ms; 1e+08 elems.] [1.644934] sumOmp
-#
-# [01539.431 ms; 1e+09 elems.] [1.644934] sum
-# [00386.245 ms; 1e+09 elems.] [1.644934] sumOmp
+# [00000.053 ms; 1e+04 elems.] [1.644725] sumSeq
+# [00000.446 ms; 1e+04 elems.] [1.644834] sumOpenmp
+# [00000.347 ms; 1e+05 elems.] [1.644725] sumSeq
+# [00000.067 ms; 1e+05 elems.] [1.644919] sumOpenmp
+# [00001.852 ms; 1e+06 elems.] [1.644725] sumSeq
+# [00000.090 ms; 1e+06 elems.] [1.644756] sumOpenmp
+# [00014.484 ms; 1e+07 elems.] [1.644725] sumSeq
+# [00001.646 ms; 1e+07 elems.] [1.644728] sumOpenmp
+# [00148.799 ms; 1e+08 elems.] [1.644725] sumSeq
+# [00008.172 ms; 1e+08 elems.] [1.644726] sumOpenmp
+# [01660.869 ms; 1e+09 elems.] [1.644725] sumSeq
+# [00078.691 ms; 1e+09 elems.] [1.644725] sumOpenmp
 ```
 
-```bash
-$ g++ -O3 -fopenmp main.cxx
-$ OMP_NUM_THREADS=48 ./a.out
-
-# [00000.050 ms; 1e+04 elems.] [1.644834] sum
-# [00019.433 ms; 1e+04 elems.] [1.644834] sumOmp
-#
-# [00000.169 ms; 1e+05 elems.] [1.644924] sum
-# [00000.035 ms; 1e+05 elems.] [1.644924] sumOmp
-#
-# [00001.684 ms; 1e+06 elems.] [1.644933] sum
-# [00000.089 ms; 1e+06 elems.] [1.644933] sumOmp
-#
-# [00017.138 ms; 1e+07 elems.] [1.644934] sum
-# [00001.443 ms; 1e+07 elems.] [1.644934] sumOmp
-#
-# [00153.407 ms; 1e+08 elems.] [1.644934] sum
-# [00016.031 ms; 1e+08 elems.] [1.644934] sumOmp
-#
-# [01437.537 ms; 1e+09 elems.] [1.644934] sum
-# [00156.583 ms; 1e+09 elems.] [1.644934] sumOmp
-```
-
-[![](https://i.imgur.com/RUIcuwK.gif)][sheets]
+[![](https://i.imgur.com/gdJQIVJ.png)][sheetp]
+[![](https://i.imgur.com/4VKbI6Q.png)][sheetp]
 
 <br>
 <br>
@@ -82,9 +50,8 @@ $ OMP_NUM_THREADS=48 ./a.out
 <br>
 <br>
 
-[![](https://i.imgur.com/KoxZ0HW.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
+[![](https://i.imgur.com/Va4qBPD.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
 
-[Prof. Dip Sankar Banerjee]: https://sites.google.com/site/dipsankarban/
-[Prof. Kishore Kothapalli]: https://cstar.iiit.ac.in/~kkishore/
 [charts]: https://photos.app.goo.gl/ruBBeXTz6vEATFQc6
 [sheets]: https://docs.google.com/spreadsheets/d/1ZBp9TFxisTn_8_7_X_2HSPt_SbmP16gUW6_fiMtr8rc/edit?usp=sharing
+[sheetp]: https://docs.google.com/spreadsheets/d/e/2PACX-1vTPFQlVfelJvgStWlpUnmAWcTZZXpYbL4APW0nc0djGLIGJdWABXx6S2QLkrxHbct_jnXJ51JlB7cv7/pubhtml
