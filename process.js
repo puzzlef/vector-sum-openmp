@@ -2,7 +2,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const ROMPTH = /^OMP_NUM_THREADS=(\d+)/m;
 const RRESLT = /^\[(.+?) ms; (.+?) elems\.\] \[(.+?)\] (.+)/m;
 
 
@@ -42,18 +41,13 @@ function writeCsv(pth, rows) {
 // -----
 
 function readLogLine(ln, data, state) {
-  if (ROMPTH.test(ln)) {
-    var [, omp_num_threads] = ROMPTH.exec(ln);
-    var omp_num_threads = parseFloat(omp_num_threads);
-    if (!data.has(omp_num_threads)) data.set(omp_num_threads, []);
-    state = {omp_num_threads};
-  }
-  else if (RRESLT.test(ln)) {
-    var [, time, elements, total, technique] = RRESLT.exec(ln);
-    data.get(state.omp_num_threads).push(Object.assign({}, state, {
+  if (data.size===0) data.set('all', []);
+  if (RRESLT.test(ln)) {
+    var [, time, elements, sum, technique] = RRESLT.exec(ln);
+    data.get('all').push(Object.assign({}, state, {
       time:     parseFloat(time),
       elements: parseFloat(elements),
-      total:    parseFloat(total),
+      sum:      parseFloat(sum),
       technique
     }));
   }
@@ -96,10 +90,6 @@ function main(cmd, log, out) {
     case 'csv':
       var rows = processCsv(data);
       writeCsv(out, rows);
-      break;
-    case 'csv-dir':
-      for (var [omp_num_threads, rows] of data)
-        writeCsv(path.join(out, omp_num_threads.toString().padStart(2, '0')+'.csv'), rows);
       break;
     default:
       console.error(`error: "${cmd}"?`);
