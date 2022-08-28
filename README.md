@@ -13,7 +13,7 @@ here. Some [charts] are also included below, generated from [sheets].
 <br>
 
 ```bash
-$ g++ -O3 -fopenmp main.cxx
+$ g++ -std=c++17 -O3 -fopenmp main.cxx
 $ ./a.out
 
 # ...
