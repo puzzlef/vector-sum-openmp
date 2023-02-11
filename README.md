@@ -12,7 +12,7 @@ would be a clear winner, the results indicate it is dependent upon the workload.
 Results indicate that **from 10⁵ elements, OpenMP** **approach performs better**
 than sequential.
 
-All outputs are saved in [out](out/) and a small part of the output is listed
+All outputs are saved in [gist] and a small part of the output is listed
 here. Some [charts] are also included below, generated from [sheets].
 
 <br>
@@ -52,6 +52,7 @@ $ ./a.out
 
 [![](https://i.imgur.com/Va4qBPD.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
 
+[gist]: https://gist.github.com/wolfram77/9b90248012dda38727d57e12786ff40c
 [charts]: https://photos.app.goo.gl/ruBBeXTz6vEATFQc6
 [sheets]: https://docs.google.com/spreadsheets/d/1ZBp9TFxisTn_8_7_X_2HSPt_SbmP16gUW6_fiMtr8rc/edit?usp=sharing
 [sheetp]: https://docs.google.com/spreadsheets/d/e/2PACX-1vTPFQlVfelJvgStWlpUnmAWcTZZXpYbL4APW0nc0djGLIGJdWABXx6S2QLkrxHbct_jnXJ51JlB7cv7/pubhtml
