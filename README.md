@@ -49,7 +49,7 @@ Some [charts] are also included below, generated from [sheets].
 
 
 [![](https://i.imgur.com/Va4qBPD.jpg)](https://www.youtube.com/watch?v=0XTLuFpuAtE)
-
+![](https://ga-beacon.deno.dev/G-KD28SG54JQ:hbAybl6nQFOtmVxW4if3xw/github.com/puzzlef/vector-sum-openmp)
 
 [gist]: https://gist.github.com/wolfram77/9b90248012dda38727d57e12786ff40c
 [charts]: https://photos.app.goo.gl/ruBBeXTz6vEATFQc6
